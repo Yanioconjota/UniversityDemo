@@ -138,7 +138,7 @@ namespace UniversityApiBackend.Controllers
 
         private bool UserExists(int id)
         {
-            return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Users?.Any(user => user.Id == id)).GetValueOrDefault();
         }
     }
 }
