@@ -10,6 +10,6 @@ namespace LinqSnippets
     {
         public int Id { get; set; }
         public string? Name { get; set; }
-        public Employee[] Employees { get; set; }
+        public Employee[] Employees { get; set; } = new Employee[0];
     }
 }
