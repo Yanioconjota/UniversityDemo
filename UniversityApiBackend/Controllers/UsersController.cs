@@ -140,5 +140,24 @@ namespace UniversityApiBackend.Controllers
         {
             return (_context.Users?.Any(user => user.Id == id)).GetValueOrDefault();
         }
+
+        // GET: https://localhost:7211/api/users/email
+        [HttpGet("{email}")]
+        public async Task<ActionResult<IEnumerable<User>>> GetUserByEmail(string email)
+        {
+            if (_context.Users == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _context.Users.Where(u => u.Email == email).ToListAsync();
+
+            if (user.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return user;
+        }
     }
 }

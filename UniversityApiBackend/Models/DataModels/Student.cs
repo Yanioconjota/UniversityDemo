@@ -15,5 +15,16 @@ namespace UniversityApiBackend.Models.DataModels
 
         [Required]
         public ICollection<Course> Courses { get; set; } = new List<Course>();
+
+        public int Age
+        {
+            get
+            {
+                var today = DateTime.Today;
+                var age = today.Year - Dob.Year;
+                if (Dob.Date > today.AddYears(-age)) age--;
+                return age;
+            }
+        }
     }
 }
