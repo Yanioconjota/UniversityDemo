@@ -161,9 +161,28 @@ namespace UniversityApiBackend.Controllers
             }
         }
 
-        // GET: api/Courses/emptyCourses
-        [HttpGet("emptyCourses")]
-        public async Task<ActionResult<IEnumerable<Course>>> GetEmptyCourses()
+        // GET: api/Courses/GetCoursesByCategory
+        [HttpGet("GetCoursesByCategory")]
+        public async Task<ActionResult<IEnumerable<Course>>> GetCoursesByCategory(string category)
+        {
+            if (_context.Courses == null)
+            {
+                return NotFound();
+            }
+
+            var courses = await _context.Courses.Where(course => course.Categories.Any(cat => cat.Name == category)).ToListAsync();
+
+            if (courses == null)
+            {
+                return NotFound();
+            }
+
+            return courses;
+        }
+
+        // GET: api/Courses/GetCoursesWithNoStudents
+        [HttpGet("GetCoursesWithNoStudents")]
+        public async Task<ActionResult<IEnumerable<Course>>> GetCoursesWithNoStudents()
         {
             if (_context.Courses == null)
             {
@@ -173,6 +192,68 @@ namespace UniversityApiBackend.Controllers
             var courses = await _context.Courses.Where(c => c.Students.Count == 0).ToListAsync();
 
             if (courses == null)
+            {
+                return NotFound();
+            }
+
+            return courses;
+        }
+
+        // GET: api/Courses/GetCoursesWithNoChapters
+        [HttpGet("GetCoursesWithNoChapters")]
+        public async Task<ActionResult<IEnumerable<Course>>> GetCoursesWithNoChapters()
+        {
+            if (_context.Courses == null)
+            {
+                return NotFound();
+            }
+
+            var courses = await _context.Courses
+                            .Include(c => c.Chapter)
+                            .Where(c => c.Chapter == null || string.IsNullOrEmpty(c.Chapter.List))
+                            .ToListAsync();
+
+            if (courses == null)
+            {
+                return NotFound();
+            }
+
+            return courses;
+        }
+
+        // GET: api/Courses/GetChaptersFromCourse
+        [HttpGet("GetChaptersFromCourse")]
+        public async Task<ActionResult<Chapter>> GetChaptersFromCourse(string courseName)
+        {
+            if (_context.Courses == null)
+            {
+                return NotFound();
+            }
+
+            var course = await _context.Courses
+                        .Include(c => c.Chapter)
+                        .FirstOrDefaultAsync(c => c.Name == courseName);
+
+            if (course == null || course.Chapter == null)
+            {
+                return NotFound();
+            }
+
+            return course.Chapter;
+        }
+
+        // GET: api/Students/GetCoursesByStudent
+        [HttpGet("GetCoursesByStudent")]
+        public async Task<ActionResult<IEnumerable<Course>>> GetCoursesByStudent(string studentName)
+        {
+            if (_context.Courses == null)
+            {
+                return Problem("Entity set 'UniversityDBContext.Students'  is null.");
+            }
+
+            var courses = await _context.Courses.Where(c => c.Students.Any(s => s.Name == studentName)).ToListAsync();
+
+            if (courses.Count == 0)
             {
                 return NotFound();
             }

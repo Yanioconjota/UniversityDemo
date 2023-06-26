@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -87,7 +87,7 @@ namespace UniversityApiBackend.Controllers
 
         // GET: api/Students/Adults
         [HttpGet("Adults")]
-        public async Task<ActionResult<IEnumerable<Student>>> GetstudentsWithCourses()
+        public async Task<ActionResult<IEnumerable<Student>>> GetAdultStudents()
         {
             if (_context.Students == null)
             {
@@ -121,6 +121,44 @@ namespace UniversityApiBackend.Controllers
             }
 
             return studentsWithCourses;
+        }
+
+        // GET: api/Students/NotCoursing
+        [HttpGet("NotCoursing")]
+        public async Task<ActionResult<IEnumerable<Student>>> GetStudentsWithNoCourses()
+        {
+            if (_context.Students == null)
+            {
+                return Problem("Entity set 'UniversityDBContext.Students'  is null.");
+            }
+
+            var studentsWithNoCourses = await _context.Students.Where(s => s.Courses.Count == 0).ToListAsync();
+
+            if (studentsWithNoCourses.Count > 0)
+            {
+                return NotFound();
+            }
+
+            return studentsWithNoCourses;
+        }
+
+        // GET: api/Students/getStudentsByCourse
+        [HttpGet("getStudentsByCourse")]
+        public async Task<ActionResult<IEnumerable<Student>>> GetStudentsByCourse(string courseName)
+        {
+            if (_context.Students == null)
+            {
+                return Problem("Entity set 'UniversityDBContext.Students'  is null.");
+            }
+
+            var studentsByCourse = await _context.Students.Where(s => s.Courses.Any(c => c.Name == courseName)).ToListAsync();
+
+            if (studentsByCourse.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return studentsByCourse;
         }
 
         // POST: api/Students
